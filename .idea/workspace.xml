@@ -4,80 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e6576fa9-89ef-44d6-9523-08845c1a4024" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Final_Project.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/yuy75.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Final_Project/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Final_Project/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Final_Project/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Final_Project/wsgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/apps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/backends.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/create_admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/generate_fake_data.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/generate_fake_photos.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/middleware.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/mycommand.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/migrations/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/signals.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/Payroll_app/error.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/Payroll_app/user_settings.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/admin.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/admin/add_new_user_form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/all_ded.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/employee_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/log.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/logout.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/partials/login_modal.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/anomalies.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/payroll_action.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/salary.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/search.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/charts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/dashboard_data.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/exports.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/payroll_calculator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/user_settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Payroll_app/views.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/cpi_adjustment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/admin.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/all_ded.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/dashboard.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/employee_list.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/salary.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/user_settings.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/PayGenius-logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/execute.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/export.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/field.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/filter-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/preview.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/images/search-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_accuracyEvaluation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_perfomance.py" afterDir="false" />
-    </list>
+    <list default="true" id="e6576fa9-89ef-44d6-9523-08845c1a4024" name="更改" comment="PayrollGenius--payroll interation system" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -190,6 +117,23 @@
       <option name="presentableId" value="Default" />
       <updated>1746625321109</updated>
     </task>
+    <task id="LOCAL-00001" summary="PayrollGenius--payroll interation system">
+      <option name="closed" value="true" />
+      <created>1747890772446</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747890772446</updated>
+    </task>
+    <task id="LOCAL-00002" summary="PayrollGenius--payroll interation system">
+      <option name="closed" value="true" />
+      <created>1747891448387</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1747891448388</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -214,6 +158,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="PayrollGenius--payroll interation system" />
+    <option name="LAST_COMMIT_MESSAGE" value="PayrollGenius--payroll interation system" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
