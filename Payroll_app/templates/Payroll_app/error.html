@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Occurred</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts for clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 40px 60px;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .error-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #c0392b;
+            margin-bottom: 16px;
+        }
+
+        .error-message {
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+
+        .home-link {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .home-link:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="error-container">
+    <div class="error-title">An Error Occurred</div>
+    <div class="error-message">{{ message }}</div>
+    <a href="/" class="home-link">Return to Home</a>
+</div>
+
+</body>
+</html>

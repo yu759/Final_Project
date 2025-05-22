@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Allowances & Deductions{% endblock %}
+
+{% block content %}
+<div class="all_ded-container">
+    <hr>
+    <h1>Allowances & Deductions</h1>
+    <section>
+        <ul>
+            <li><strong>Transport Allowance</strong>: £0.45/mile (HMRC standard), applicable to all Client Managers.</li>
+            <li><strong>Meal Allowance</strong>: £25/weekday (London only), applicable to VP level and above.</li>
+        </ul>
+    </section>
+    <hr>
+    <form id="ruleForm">
+        <section>
+            <h4>Rule Configuration</h4>
+            <label for="rule_name">Rule Name:
+                <input type="text" id="rule_name" name="rule_name" placeholder="Enter rule name" required>
+            </label>
+        </section>
+        <section>
+            <h2>Condition Configuration</h2>
+            <h4>Step 1: Select Condition</h4>
+            <label for="condition_type">Condition Type:
+                <select id="condition_type" name="condition_type">
+                    <option value="rank">Employee Rank</option>
+                    <option value="salary">Salary</option>
+                </select>
+            </label>
+            <label for="rank">Employee Rank:
+                <select id="rank" name="rank">
+                    {% for rank, label in employee_ranks %}
+                    <option value="{{ rank }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label for="comparator">Comparator:
+                <select id="comparator" name="comparator">
+                    <option value=">">Greater than</option>
+                    <option value="<">Less than</option>
+                    <option value="==">Equal to</option>
+                </select>
+            </label>
+            <label for="threshold">Threshold:
+                <input type="number" id="threshold" name="threshold" placeholder="e.g. 64" required>
+            </label>
+        </section>
+
+        <section>
+            <h4>Step 2: Calculation Mode</h4>
+            <label for="calcMode">Discount Type:
+                <select id="calcMode" name="calculation_type">
+                    <option value="percent">Percentage</option>
+                    <option value="fixed">Fixed Amount</option>
+                </select>
+            </label>
+            <label for="calcValue">Value:
+                <input type="text" id="calcValue" name="value" placeholder="[13]% or [£50]" />
+            </label>
+        </section>
+
+        <section>
+            <h4>Step 3: Exception Rules</h4>
+            <label for="exceptions">Exclude Departments (Multiple options):
+                <select id="exceptions" name="exclude_departments[]" multiple>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.dept_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </section>
+
+        <hr>
+        <section>
+            <h2>Rule Preview</h2>
+            <p id="previewArea">
+                Preview rule like: <strong>Employee Rank > 64</strong>, result: <strong>Salary reduced by 15%</strong>.
+            </p>
+            <div class="rule-buttons">
+                <button type="button" id="previewBtn">
+                    <img src="{% static 'images/preview.png' %}" alt="Preview" />Use Preview
+                </button>
+                <button type="submit" class="execute-button" id="executeBtn">
+                    <img src="{% static 'images/execute.png' %}" alt="Execute" />Execute Rule
+                </button>
+                <button type="button" id="fieldDescBtn">
+                    <img src="{% static 'images/field.png' %}" alt="Field Info" />Field description
+                </button>
+            </div>
+        </section>
+
+        <div id="fieldModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="modalCloseBtn">&times;</span>
+                <h4>Field description</h4>
+                <ul>
+                    <li><strong>Employee Rank</strong>: Employee level, corresponding to the <code>employees.rank</code> field.</li>
+                    <li><strong>Comparator</strong>: Judgment symbols (>, <, ==) used for filtering conditions.</li>
+                    <li><strong>Calculation Mode</strong>: A fixed amount or percentage used for calculating allowances or deductions.</li>
+                    <li><strong>Exceptions</strong>: Excluded departments, values from <code>employees.department</code>.</li>
+                    <li><strong>Department & Grade</strong>: Used to filter dimensions when matching rules.</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr>
+        <section>
+            <h2>Department & Role Association</h2>
+            <label>Select Department:
+                <select id="department">
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.dept_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Select Grade:
+                <select id="grade">
+                    <option value="A">Grade A</option>
+                    <option value="B">Grade B</option>
+                    <option value="C">Grade C</option>
+                    <option value="D">Grade D</option>
+                </select>
+            </label>
+            <label>Apply Rule:
+                <select>
+                    <option>Transport Allowance</option>
+                    <option>Meal Allowance</option>
+                </select>
+            </label>
+        </section>
+
+        <section style="margin-top: 30px;">
+            <h2>Explanation of data source</h2>
+            <ul>
+                <li><strong>employees</strong> Table: Contains rank, department, and grade fields</li>
+                <li><strong>payroll</strong> Table: Stores original salary data</li>
+                <li><strong>allowances</strong> Table: Records various allowances (e.g., transportation and meal subsidies)</li>
+                <li><strong>taxes</strong> Table: Records deduction information for income tax, national insurance, etc.</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section class="logs">
+            <h2>Operation Logs</h2>
+            <div class="logs-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operation Time</th>
+                            <th>Operator</th>
+                            <th>Details</th>
+                            <th>Type</th>
+                            <th>Changes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTable">
+                        {% for log in operation_logs %}
+                        <tr>
+                            <td>{{ log.timestamp }}</td>
+                            <td>{{ log.user_email }}</td>
+                            <td>{{ log.model_name }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.changes }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No operation logs available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section>
+            <h4>Dynamically Fetched Allowances:</h4>
+            <div id="dynamic-allowances"></div>
+        </section>
+        <section>
+            <h4>Dynamically Fetched Deductions:</h4>
+            <div id="dynamic-deductions"></div>
+        </section>
+    </form>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [key, value] = cookie.trim().split('=');
+            if (key === name) {
+                cookieValue = decodeURIComponent(value);
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+const currentRuleId = 1;
+
+function generatePreview() {
+    console.log("generatePreview() called");
+    const rankSelect = document.getElementById('rank');
+    const comparatorSelect = document.getElementById('comparator');
+    const calcValueInput = document.getElementById('calcValue');
+
+    if (!rankSelect || !comparatorSelect || !calcValueInput) {
+        console.error("One or more input elements not found!");
+        alert("Error: Could not find required input fields.");
+        return; // Stop execution if elements are missing
+    }
+
+    const rank = rankSelect.value;
+    const comp = comparatorSelect.value;
+    const val = calcValueInput.value;
+    const result = comp === '>' ? 'Salary reduced by' : 'Salary adjustment:';
+    const previewText = `Preview rule like: <strong>Employee Rank ${comp} ${rank}</strong>, result: <strong>${result} ${val}</strong>.`;
+    document.getElementById('previewArea').innerHTML = previewText;
+    alert(previewText);
+}
+
+function executeRule() {
+    console.log("executeRule() called");
+    const now = new Date();
+    const timestamp = now.toISOString().replace('T', ' ').slice(0, 16);
+    const operator = 'SystemUser';
+    const details = 'Manually executed rule'; // More descriptive details
+    const type = 'Manual';
+
+    const table = document.getElementById('logTable');
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `<td>${timestamp}</td>
+                       <td>${operator}</td>
+                       <td>${details}</td>
+                       <td>${type}</td>
+                       <td>Executed rule ID: ${currentRuleId}</td>`;
+    table.prepend(newRow);
+    alert("Rule executed successfully.");
+    }
+
+    document.getElementById('previewBtn').addEventListener('click', function() {
+    generatePreview();
+    });
+
+    document.getElementById('executeBtn').addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent form submission
+    executeRule();
+    });
+
+    document.getElementById('fieldDescBtn').addEventListener('click', function() {
+    const modal = document.getElementById('fieldModal');
+    modal.style.display = "block";
+    });
+
+    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+    const modal = document.getElementById('fieldModal');
+    modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside content
+    window.onclick = function(event) {
+    const modal = document.getElementById('fieldModal');
+    if (event.target === modal) {
+    modal.style.display = "none";
+    }
+    };
+
+    document.getElementById('ruleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    function getSelectedDepartments() {
+    const select = document.getElementById('exceptions');
+    return Array.from(select.selectedOptions).map(opt => opt.value);
+    }
+
+    const payload = {
+        rule_name: document.getElementById('rule_name').value,
+        condition_type: document.getElementById('condition_type').value,
+        comparator: document.getElementById('comparator').value,
+        threshold: document.getElementById('threshold').value,
+        calculation_type: document.getElementById('calcMode').value,
+        value: document.getElementById('calcValue').value,
+        exclude_departments: getSelectedDepartments()
+    };
+
+    fetch('/configure_rule/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Rule created with ID: " + data.rule_id);
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => {
+        alert("Failed to save rule: " + error.message);
+    });
+});
+
+    fetch('/api/all_ded_data/')
+    .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+    })
+    .then(data => {
+        const allowancesDiv = document.getElementById('dynamic-allowances');
+        data.allowances.forEach(item => {
+            allowancesDiv.innerHTML += `<div>${item.name} - ${item.amount}</div>`;
+        });
+        const deductionsDiv = document.getElementById('dynamic-deductions');
+        data.deductions.forEach(item => {
+            deductionsDiv.innerHTML += `<div>${item.name} - ${item.amount}</div>`;
+        });
+    })
+    .catch(err => {
+        console.error("Error fetching allowances and deductions:", err);
+    });
+</script>
+{% endblock %}

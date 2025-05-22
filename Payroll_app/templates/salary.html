@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Salary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="step-indicator mb-4">
+        <span id="step1" class="active">1. Select Employee</span>
+        <span id="step2">2. Set Parameter</span>
+        <span id="step3">3. Preview Result</span>
+        <span id="step4">4. Confirm Submit</span>
+    </div>
+    <div class="row">
+        <div class="col-md-5 form-section">
+            <h5 class="mb-3">Select Employee</h5>
+            <div class="mb-3">
+                <input type="text" id="employeeSearch" class="form-control mb-2" placeholder="Search for employees...">
+                <div id="searchResults" class="list-group" style="position: absolute; z-index: 1000; width: 100%; display: none;">
+                </div>
+            </div>
+            <div id="employeeList">
+                <div class="mb-3">
+                    <div class="d-flex align-items-center">
+                        <input type="checkbox" id="selectAllEmployees" class="me-2">
+                        <label for="selectAllEmployees" class="mb-0 fw-bold">Select All</label>
+                    </div>
+                </div>
+                {% for emp in all_employees %}
+                    {% if forloop.counter <= 5 %}
+                        <div class="d-flex align-items-center mb-1 employee-item" id="employee-item-{{ emp.id }}"
+                             style="display: none;">
+                            <input type="checkbox" name="selectedEmployees" value="{{ emp.id }}" class="me-2"
+                                   data-salary="{{ emp.salary }}" data-employee-name="{{ emp.first_name }} {{ emp.last_name }}">
+                            <label class="mb-0">{{ emp.first_name }} {{ emp.last_name }}</label>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <div>No employees available.</div>
+                {% endfor %}
+            </div>
+
+            <h5 class="mt-4">Parameter Adjustment</h5>
+            <label for="performance">Performance Coefficient：<span id="performanceVal">1.0</span></label>
+            <input type="range" class="form-range" id="performance" min="0.8" max="1.5" step="0.01" value="1.0">
+
+            <div class="amount-input mb-2">
+                <label>Special Allowance</label>
+                <input type="number" id="allowance" class="form-control" placeholder="0">
+            </div>
+            <div class="amount-input mb-4">
+                <label>Custom Deduction</label>
+                <input type="number" id="deduction" class="form-control" placeholder="0">
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <h5>Real-time Preview</h5>
+            <table class="table table-bordered salary-table">
+                <tbody>
+                <tr>
+                    <th>Basic Salary</th>
+                    <td id="basicSalary">£20,000</td>
+                </tr>
+                <tr>
+                    <th>Performance Bonus</th>
+                    <td id="bonus">£0</td>
+                </tr>
+                <tr>
+                    <th>Special Allowance</th>
+                    <td id="addAllowance">£0</td>
+                </tr>
+                <tr>
+                    <th>Custom Deduction</th>
+                    <td id="customDeduct">-£0</td>
+                </tr>
+                <tr>
+                    <th><strong>Total Salary</strong></th>
+                    <td id="totalSalary"><strong>£20,000</strong></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h5>Comparison of historical records</h5>
+            <ul class="list-group">
+                {% for log in salary_logs %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-secondary">{{ log.timestamp|date:"Y-m-d H:i" }}</span>
+                        <span>
+                            {% if log.changes.total_salary %}
+                                £{{ log.changes.total_salary }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No salary logs available.</li>
+                {% endfor %}
+            </ul>
+
+            <div class="mt-4 text-end">
+                <button class="btn btn-secondary me-2" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn">Submit</button>
+                <button id="detectAnomaliesBtn" class="btn btn-primary">Detect Salary Anomalies</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const employeeSearchInput = document.getElementById('employeeSearch');
+    const searchResultsDiv = document.getElementById('searchResults');
+    const employeeListDiv = document.getElementById('employeeList');
+    const selectAllCheckbox = document.getElementById('selectAllEmployees');
+    const performanceInput = document.getElementById('performance'); // Store the input elements in variables
+    const allowanceInput = document.getElementById('allowance');
+    const deductionInput = document.getElementById('deduction');
+    let employeeCheckboxes = [];
+
+    function updateStepIndicator(stepNumber) {
+        const steps = [1, 2, 3, 4];
+        steps.forEach(num => {
+            const stepElem = document.getElementById(`step${num}`);
+            if (stepElem) {
+                if (num === stepNumber) {
+                    stepElem.classList.add('active');
+                } else {
+                    stepElem.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        employeeCheckboxes = document.querySelectorAll('input[name="selectedEmployees"]');
+        attachCheckboxListeners();
+        updateStepIndicator(1);
+        showInitialEmployees();
+        updateSalary(); // Initial update to show default values
+    });
+
+    function showInitialEmployees() {
+        fetch('/employees/search/?q=')
+            .then(response => response.json())
+            .then(data => {
+                employeeListDiv.innerHTML = '';
+                data.forEach(employee => {
+                    const fullName = `${employee.first_name} ${employee.last_name}`;
+                    const newDiv = document.createElement('div');
+                    newDiv.classList.add('d-flex', 'align-items-center', 'mb-1', 'employee-item');
+                    newDiv.innerHTML = `
+                        <input type="checkbox" name="selectedEmployees" value="${employee.id}" class="me-2" data-salary="20000" data-employee-name="${fullName}">
+                        <label class="mb-0">${fullName}</label>`;
+                    employeeListDiv.appendChild(newDiv);
+                });
+                employeeCheckboxes = document.querySelectorAll('input[name="selectedEmployees"]');
+                attachCheckboxListeners();
+                updateSalary(); // Update after initial employees are loaded
+            })
+            .catch(error => console.error('Error fetching initial employees:', error));
+    }
+
+    function searchEmployees(query) {
+        fetch(`/employees/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                searchResultsDiv.innerHTML = '';
+                if (data.length > 0) {
+                    searchResultsDiv.style.display = 'block';
+                    data.forEach(employee => {
+                        const fullName = `${employee.first_name} ${employee.last_name}`;
+                        const listItem = document.createElement('a');
+                        listItem.href = '#';
+                        listItem.classList.add('list-group-item', 'list-group-item-action');
+                        listItem.textContent = fullName;
+                        listItem.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            selectEmployee(employee.id, fullName, employee.salary); // Pass salary
+                            searchResultsDiv.style.display = 'none';
+                            employeeSearchInput.value = '';
+                        });
+                        searchResultsDiv.appendChild(listItem);
+                    });
+                } else {
+                    searchResultsDiv.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error searching employees:', error));
+    }
+
+    function selectEmployee(employeeId, fullName, salary) {
+        const existingCheckbox = document.querySelector(`input[name="selectedEmployees"][value="${employeeId}"]`);
+        if (existingCheckbox) {
+            existingCheckbox.checked = true;
+        } else {
+            const newDiv = document.createElement('div');
+            newDiv.classList.add('d-flex', 'align-items-center', 'mb-1', 'employee-item');
+            newDiv.innerHTML = `
+                <input type="checkbox" name="selectedEmployees" value="${employeeId}" checked class="me-2" data-salary="${salary}" data-employee-name="${fullName}">
+                <label class="mb-0">${fullName}</label>`;
+            employeeListDiv.appendChild(newDiv);
+            employeeCheckboxes = document.querySelectorAll('input[name="selectedEmployees"]');
+            attachCheckboxListeners();
+        }
+        updateSalary(); // Update after selecting an employee
+    }
+
+    employeeSearchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        if (query.length > 0) {
+            searchEmployees(query);
+        } else {
+            searchResultsDiv.style.display = 'none';
+            showInitialEmployees();
+        }
+    });
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            employeeCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSalary(); // Update when "Select All" changes
+        });
+    }
+
+    function attachCheckboxListeners() {
+        employeeCheckboxes = document.querySelectorAll('input[name="selectedEmployees"]');
+        employeeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    selectAllCheckbox.checked = false;
+                } else if (document.querySelectorAll('input[name="selectedEmployees"]:checked').length === employeeCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                }
+                updateSalary(); // Update when individual checkboxes change
+            });
+        });
+    }
+
+    function getInputNumber(id, defaultVal) {
+        const val = parseFloat(document.getElementById(id).value);
+        return isNaN(val) ? defaultVal : val;
+    }
+
+    function updateSalary() {
+        let totalBasicSalary = 0;
+        let totalBonus = 0;
+        let totalAllowance = 0;
+        let totalDeduction = 0;
+        let employeeDetails = [];
+
+        const selectedEmployees = document.querySelectorAll('input[name="selectedEmployees"]:checked');
+        const performance = parseFloat(performanceInput.value);
+        const allowance = parseFloat(allowanceInput.value) || 0;
+        const deduction = parseFloat(deductionInput.value) || 0;
+
+        selectedEmployees.forEach(checkbox => {
+            const employeeId = checkbox.value;
+            const baseSalary = parseFloat(checkbox.dataset.salary) || 20000; // Get base salary from data attribute
+            totalBasicSalary += baseSalary;
+            const bonus = baseSalary * (performance - 1);
+            totalBonus += bonus;
+            totalAllowance += allowance;
+            totalDeduction += deduction;
+
+            employeeDetails.push({
+                employee_name: checkbox.dataset.employeeName,
+                basic_salary: baseSalary.toFixed(2),
+                bonus: bonus.toFixed(2),
+                allowance: allowance.toFixed(2),
+                deduction: deduction.toFixed(2),
+                total_salary: (baseSalary + bonus + allowance - deduction).toFixed(2)
+            });
+        });
+
+        const basicSalaryElem = document.getElementById('basicSalary');
+        if (basicSalaryElem) basicSalaryElem.textContent = `£${totalBasicSalary.toFixed(2)}`;
+        const bonusElem = document.getElementById('bonus');
+        if (bonusElem) bonusElem.textContent = `£${totalBonus.toFixed(2)}`;
+        const addAllowanceElem = document.getElementById('addAllowance');
+        if (addAllowanceElem) addAllowanceElem.textContent = `£${totalAllowance.toFixed(2)}`;
+        const customDeductElem = document.getElementById('customDeduct');
+        if (customDeductElem) customDeductElem.textContent = `-£${totalDeduction.toFixed(2)}`;
+        const totalSalaryElem = document.getElementById('totalSalary');
+        if (totalSalaryElem) totalSalaryElem.textContent = `£${(totalBasicSalary + totalBonus + totalAllowance - totalDeduction).toFixed(2)}`;
+
+        const resultList = document.getElementById('resultList');
+        if (resultList) {
+            resultList.innerHTML = '';
+            employeeDetails.forEach(detail => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${detail.employee_name}</td>
+                    <td>£${detail.basic_salary}</td>
+                    <td>£${detail.bonus}</td>
+                    <td>£${detail.allowance}</td>
+                    <td>-£${detail.deduction}</td>
+                    <td>£${detail.total_salary}</td>
+                `;
+                resultList.appendChild(row);
+            });
+        }
+    }
+
+    performanceInput.addEventListener('input', function() {
+        document.getElementById('performanceVal').textContent = this.value;
+        updateSalary();
+        updateStepIndicator(2);
+    });
+    allowanceInput.addEventListener('input', function() {
+        updateSalary();
+        updateStepIndicator(2);
+    });
+    deductionInput.addEventListener('input', function() {
+        updateSalary();
+        updateStepIndicator(2);
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', function() {
+        const selectedEmployees = document.querySelectorAll('input[name="selectedEmployees"]:checked');
+
+        if (selectedEmployees.length === 0) {
+            alert('Please select at least one employee!');
+            updateStepIndicator(1);
+            return;
+        }
+
+        const performance = parseFloat(performanceInput.value);
+        if (isNaN(performance)){
+            alert('Invalid performance coefficient!');
+            updateStepIndicator(2);
+            return;
+        }
+
+        const data = {
+            employee_ids: Array.from(selectedEmployees).map(cb => cb.value),
+            performance: performance,
+            allowance: parseFloat(allowanceInput.value) || 0,
+            deduction: parseFloat(deductionInput.value) || 0
+        };
+
+        fetch('/calculate_salary/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Server did not return valid JSON. Response: ' + text);
+                }
+            });
+        })
+        .then(result => {
+            if (result.status === 'success') {
+                alert('Salary adjustments submitted successfully!');
+                resetForm();
+            } else {
+                alert('Failed to submit salary adjustments: ' +  (result.message || 'Unknown error.'));
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting salary adjustments:', error);
+            alert('An error occurred while submitting.');
+        });
+        updateStepIndicator(4);
+    });
+
+    function resetForm() {
+    document.querySelectorAll('input[name="selectedEmployees"]').forEach(checkbox => checkbox.checked = false);
+        selectAllCheckbox.checked = false;
+        performanceInput.value = 1.0;
+        document.getElementById('performanceVal').textContent = '1.0';
+        allowanceInput.value = '';
+        deductionInput.value = '';
+
+        updateSalary();
+
+        updateStepIndicator(1);
+        alert('Cancel successfully!');
+    }
+
+    function getCSRFToken() {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const [name, value] = cookies[i].trim().split('=');
+            if (name === 'csrftoken') return value;
+        }
+        return '';
+    }
+    document.getElementById('detectAnomaliesBtn').addEventListener('click', function() {
+        window.location.href = "{% url 'anomalies' %}";
+    });
+
+</script>
+{% endblock %}

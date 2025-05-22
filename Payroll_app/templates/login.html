@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="login-container">
+        <h1>Welcome PayGenius</h1>
+    </div>
+        <!-- Login Content -->
+         {% include 'partials/login_modal.html' %}
+<script>
+window.onload = function () {
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    loginModal.show();
+};
+
+</script>
+{% endblock %}

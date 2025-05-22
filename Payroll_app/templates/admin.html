@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrations{% endblock %}
+
+{% block content %}
+    <div class="admin-container">
+        <!-- Administrations -->
+        <h2>Admin Panel</h2>
+        <div class="sidebar">
+            <ul>
+                <li onclick="showSection('cpi-section')" class="active">CPI Adjustment</li>
+                <li onclick="showSection('role-section')">Role Permissions</li>
+                <li onclick="showSection('log-section')">Operation Logs</li>
+                <li onclick="showSection('sql-section')">SQL Console (DBA)</li>
+                <li onclick="showSection('task-section')">Task Scheduler</li>
+                <li onclick="window.location.href='{% url 'AddNewUser' %}'">Register User</li>
+            </ul>
+        </div>
+    </div>
+        <div class="main-content">
+            <div id="cpi-section" class="section active">
+                <h3>CPI Adjustment</h3>
+                <form>
+                    <label>Current CPI:</label><br>
+                    <input type="number" step="0.01"><br>
+                    <label>CPI Coefficient:</label><br>
+                    <input type="number" step="0.01"><br>
+                    <label>Minimum Salary:</label><br>
+                    <input type="number"><br>
+                    <label>Effective Date:</label><br>
+                    <input type="date"><br>
+                    <button type="submit">Save and Recalculate</button>
+                </form>
+            </div>
+
+            <div id="role-section" class="section">
+                <h3>Role-Based Access Control</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>User Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Finance Admin</td>
+                        <td>View/Edit Payroll</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>HR Admin</td>
+                        <td>Manage Employees</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>System Engineer</td>
+                        <td>System Maintenance</td>
+                        <td>1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="log-section" class="section">
+                <h3>Operation Logs</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>User</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="log-body">
+                    <tr>
+                        <td>192.168.1.100</td>
+                        <td>admin</td>
+                        <td>2025-05-08 14:23</td>
+                        <td>Modified CPI parameters</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="sql-section" class="section">
+                <h3>SQL Console (DBA only)</h3>
+                <textarea rows="5" cols="60" placeholder="SELECT * FROM bonus_rules;"></textarea><br>
+                <button>Execute</button>
+                <div style="margin-top:10px;">
+                    <h4>Query Results:</h4>
+                    <table>
+                        <thead>
+                        <tr><th>Field1</th><th>Field2</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><td>Example</td><td>Data</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="task-section" class="section">
+                <h3>Task Monitoring</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Schedule</th>
+                        <th>Status</th>
+                        <th>Next Run</th>
+                        <th>Last Failure</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Monthly Allowance Calculation</td>
+                        <td>0 0 1 * *</td>
+                        <td>Active</td>
+                        <td>2025-06-01 00:00</td>
+                        <td>-</td>
+                        <td><button>Retry</button></td>
+                    </tr>
+                    <tr>
+                        <td>Daily DB Backup</td>
+                        <td>0 2 * * *</td>
+                        <td>Error</td>
+                        <td>2025-05-09 02:00</td>
+                        <td>2025-05-08 02:01</td>
+                        <td><button>Retry</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+<script>
+    function showSection(sectionId) {
+        // Switch the main content area
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => section.classList.remove('active'));
+
+        const target = document.getElementById(sectionId);
+        if (target) {
+            target.classList.add('active');
+        }
+
+        // Switch the sidebar highlighting
+        const items = document.querySelectorAll('.sidebar ul li');
+        items.forEach(item => item.classList.remove('active'));
+
+        const clickedItem = Array.from(items).find(li =>
+            li.getAttribute('onclick')?.includes(sectionId)
+        );
+        if (clickedItem) {
+            clickedItem.classList.add('active');
+        }
+    }
+</script>
+
+{% endblock %}

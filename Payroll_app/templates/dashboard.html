@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="stats-panel">
+        <div class="stat-card">
+            <h3>Total Payroll This Month</h3>
+            <p class="stat-value">£{{ total_payroll }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Average Net Salary</h3>
+            <p class="stat-value">£{{ avg_net_salary }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Bonuses This Month</h3>
+            <p class="stat-value">£{{ total_bonuses }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Employees Count</h3>
+            <p class="stat-value">{{ employee_count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Active Employees</h3>
+            <p class="stat-value">{{ active_employees }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Pending Adjustments</h3>
+            <p class="stat-value">{{ pending_adjustments }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Overdue Reports</h3>
+            <p class="stat-value">{{ overdue_reports }}</p>
+        </div>
+    </div>
+
+    <div class="visualization-panel">
+        <div class="chart-tabs">
+            <button onclick="switchChart(0)" class="active">Trend Chart</button>
+            <button onclick="switchChart(1)">Department Distribution</button>
+            <button onclick="switchChart(2)">Annual Heatmap</button>
+        </div>
+        <div class="chart-container">
+            <div id="trend-chart" class="chart-item active">{{ trend_chart|safe }}</div>
+            <div id="dept-chart" class="chart-item">{{ dept_chart|safe }}</div>
+            <div id="heatmap-chart" class="chart-item">{{ heatmap_chart|safe }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button type="button" id="generateReportButton" class="generate-report-btn">Generate Report</button>
+        <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{% static 'images/export.png' %}" alt="Export" style="width:16px; vertical-align:middle; margin-right:6px;">
+                Export
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                <li><a class="dropdown-item" href="{% url 'export_chart_pdf' %}">Export Chart PDF</a></li>
+                <li>
+                    <a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#salaryExportModal">
+                        Export Salary Data
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#employeeExportModal">
+                        Export Employee Info
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="salaryExportModal" tabindex="-1" aria-labelledby="salaryExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salaryExportModalLabel">Export Salary Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="get" action="{% url 'export_salary_data' %}" id="salaryExportForm">
+                    {% csrf_token %}
+                    <label>Select Format:</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="format" value="csv" id="salaryCsv" checked>
+                        <label class="form-check-label" for="salaryCsv">CSV</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="format" value="pdf" id="salaryPdf">
+                        <label class="form-check-label" for="salaryPdf">PDF</label>
+                    </div>
+                    <br>
+                    <label>Select Time Range:</label><br>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="time_range" value="monthly" id="salaryMonthly" checked>
+                        <label class="form-check-label" for="salaryMonthly">Monthly</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="time_range" value="yearly" id="salaryYearly">
+                        <label class="form-check-label" for="salaryYearly">Yearly</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="time_range" value="custom" id="salaryCustom">
+                        <label class="form-check-label" for="salaryCustom">Custom</label>
+                        <div id="customDateRange" style="display: none;">
+                            <label for="start_date">Start Date:</label>
+                            <input type="date" name="start_date" class="form-control form-control-sm" id="start_date" placeholder="yyyy-mm-dd">
+                            <label for="end_date" class="mt-1">End Date:</label>
+                            <input type="date" name="end_date" class="form-control form-control-sm" id="end_date" placeholder="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary" id="exportSalaryButton">Export Salary Data</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="employeeExportModal" tabindex="-1" aria-labelledby="employeeExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeExportModalLabel">Export Employee Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="get" action="{% url 'export_employees' %}" id="employeeExportForm">
+                    {% csrf_token %}
+                    <label>Select the export format:</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="format" value="pdf" id="employeePdf" checked>
+                        <label class="form-check-label" for="employeePdf">PDF</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="format" value="csv" id="employeeCsv">
+                        <label class="form-check-label" for="employeeCsv">CSV</label>
+                    </div>
+                    <br>
+                    <label>Select fields:</label><br>
+                    <div class="row">
+                        {% for field in export_fields %}
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="fields" value="{{ field }}" id="field_{{ forloop.counter }}" checked>
+                                <label class="form-check-label" for="field_{{ forloop.counter }}">{{ field|capfirst }}</label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    <label>Select department (multiple selections are allowed):</label><br>
+                    <select name="departments" class="form-select" multiple>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.dept_name }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <button type="submit" class="btn btn-primary">Export Employee Information</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function switchChart(chartIndex) {
+    const chartContainer = document.querySelector('.chart-container');
+    const charts = Array.from(chartContainer.children);
+    const buttons = document.querySelectorAll('.chart-tabs button');
+
+    if (chartIndex < 0 || chartIndex >= charts.length || chartIndex >= buttons.length) {
+        console.error('Invalid chart index:', chartIndex);
+        return;
+    }
+
+    charts.forEach(chart => chart.classList.remove('active'));
+    buttons.forEach(button => button.classList.remove('active'));
+
+    charts[chartIndex].classList.add('active');
+    buttons[chartIndex].classList.add('active');
+
+    console.log('Switched to chart:', chartIndex);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const salaryExportForm = document.getElementById('salaryExportForm');
+    if (salaryExportForm) {
+        salaryExportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const queryString = new URLSearchParams(formData).toString();
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text || 'Failed to export salary data.'); });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const format = formData.get('format');
+                a.download = `salary_data.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error exporting salary data:', error);
+                alert('Failed to export salary data: ' + error.message);
+            });
+        });
+    }
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = cookie.substring(name.length + 1);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e6576fa9-89ef-44d6-9523-08845c1a4024" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/Final_Project.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/yuy75.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Final_Project/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Final_Project/settings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Final_Project/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Final_Project/wsgi.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/admin.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/apps.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/backends.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/create_admin.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/generate_fake_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/generate_fake_photos.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/middleware.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/management/commands/mycommand.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/migrations/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/signals.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/Payroll_app/error.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/Payroll_app/user_settings.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/admin.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/admin/add_new_user_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/all_ded.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/employee_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/log.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/logout.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/partials/login_modal.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/anomalies.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/payroll_action.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/payroll/report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/salary.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/templates/search.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/charts.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/dashboard_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/exports.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/payroll_calculator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/utils/user_settings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Payroll_app/views.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/cpi_adjustment.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/admin.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/all_ded.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/dashboard.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/employee_list.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/salary.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/user_settings.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/PayGenius-logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/execute.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/export.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/field.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/filter-icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/preview.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/search-icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_accuracyEvaluation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_perfomance.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2wlo3I0a9OOUJMRnBbgbcuaVolJ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Python.admin.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.test5-2.executor": "Run",
+    "Python.test5.2.executor": "Run",
+    "Python.urls.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/pythonOne/Final_Project/static/images",
+    "settings.editor.selected.configurable": "settings.sync"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\pythonOne\Final_Project\static\images" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\pythonOne\Final_Project\Payroll_app" />
+      <recent name="D:\pythonOne\Final_Project" />
+      <recent name="D:\pythonOne\Final_Project\Payroll_app\model" />
+      <recent name="D:\pythonOne\Final_Project\Payroll_app\view" />
+      <recent name="D:\pythonOne\Final_Project\Payroll_app\supporting_document" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="test_perfomance" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Final_Project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="D:\pythonOne\Final_Project\test\test_perfomance.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.test_perfomance" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-fc1d50d2d915-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.24978.54" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="e6576fa9-89ef-44d6-9523-08845c1a4024" name="更改" comment="" />
+      <created>1746625321109</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1746625321109</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

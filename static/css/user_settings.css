@@ -1,0 +1,153 @@
+h2 {
+  margin-top: 40px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 8px;
+}
+
+.section {
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.approval-list, .record-list, .api-keys {
+  list-style: none;
+  padding: 0;
+}
+
+.approval-item, .record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.record-item div:last-child {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.approval-item:last-child, .record-item:last-child {
+  border-bottom: none;
+}
+
+.actions button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.actions button:hover {
+  background-color: #cbd5e1;
+}
+
+.status {
+  font-weight: bold;
+  color: red;
+}
+
+.symbol {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.symbol.plus {
+  color: green;
+}
+
+.symbol.minus {
+  color: red;
+}
+
+.notification-option label {
+  display: block;
+  margin: 8px 0;
+}
+
+.api-key {
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.api-key span {
+  font-family: monospace;
+}
+
+.api-buttons button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.api-buttons button:hover {
+  background: #cbd5e1;
+}
+
+.dot {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+.dot.enabled {
+  color: green;
+}
+
+.dot.disabled {
+  color: #bbb;
+}
+
+.api-details {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 5px;
+}
+
+#keyExpiration {
+    font-weight: bold;
+}
+
+.loading-indicator {
+    opacity: 0.6;
+    pointer-events: none; /* Disable interactions */
+}
+
+.success-message {
+    color: green;
+    margin-top: 10px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.approval-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.approval-table th, .approval-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.approval-table th {
+    background-color: #f2f2f2;
+}

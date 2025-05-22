@@ -1,0 +1,95 @@
+.admin-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    align-items: flex-start;
+}
+.admin-header-sidebar {
+    width: 300px; /* 设置左侧标题和侧边栏的宽度 */
+}
+
+.sidebar {
+    background: #f5f5f5;
+    border-right: 1px solid #ccc;
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background 0.2s;
+}
+
+.sidebar li:hover {
+    background-color: #e0e0e0;
+}
+
+.sidebar li.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+input, textarea, button {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

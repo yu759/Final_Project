@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employees{% endblock %}
+{% block content %}
+<div class="employees-container">
+        <!-- Employees -->
+   <header>
+       {% if user.is_authenticated and employee %}
+            <section class="employee-details">
+                <h2>Your Employee Information</h2>
+                <table>
+                    <tr>
+                        <th>Job Number</th>
+                        <td>{{ employee.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Photo</th>
+                        <td>
+                            {% if employee.photo %}
+                                <img src="{{ employee.photo.image.url }}" alt="Your Photo" style="max-width: 100px; max-height: 100px;">
+                            {% else %}
+                                <p>No photo available.</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Position</th>
+                        <td>{{ employee.position.title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pension Amount</th>
+                        <td>
+                            {% if employee.pensions.all %}
+                                {{ employee.pensions.first.amount }}
+                                (Employee: {{ employee.pensions.first.employee_contribution }}%,
+                                Employer: {{ employee.pensions.first.employer_contribution }}%)
+                            {% else %}
+                                Not Enrolled
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Basic Salary</th>
+                        <td>${{ employee.salary }}</td>
+                    </tr>
+                    <tr>
+                        <th>Department</th>
+                        <td>{{ employee.department.dept_name }}</td>
+                    </tr>
+                </table>
+            </section>
+        {% else %}
+            <p>You are not logged in or employee data is missing.</p>
+        {% endif %}
+    </header>
+
+        <!-- Filter the expansion button + fold the content -->
+    <div class="filter-toggle">
+        <button id="toggleAdvanced" title="Advanced Filters" style="background:none;border:none;cursor:pointer;">
+            <img src="{% static 'images/filter-icon.png' %}" alt="Filter" style="width:24px;height:24px;">
+        </button>
+    </div>
+
+    <div class="advanced" id="advancedFilters" style="display: none; margin-top: 1rem;">
+        <form method="get" action="{% url 'employee_list' %}">
+            <label>Department:
+                <select name="dept"> <option value="">All</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept.dept_name }}">{% if request.GET.dept == dept.dept_name %}selected{% endif %}>{{ dept.dept_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Salary Range:
+                <input type="number" name="min_salary" placeholder="Min" value="{{ request.GET.min_salary }}">  -
+                <input type="number" name="max_salary" placeholder="Max" value="{{ request.GET.max_salary }}">
+            </label>
+            <label>Date of Joining:
+                <input type="date" name="doj_start" value="{{ request.GET.doj_start }}">  -
+                <input type="date" name="doj_end" value="{{ request.GET.doj_end }}">
+            </label>
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+        <!-- Additional advanced filters here -->
+    <section>
+        <div class="actions">
+            <input type="file" id="csvFile" accept=".csv" style="display: none;"> <button id="bulkImportBtn">Bulk Import (CSV)</button>
+            <button id="addModalBtn">Add Via Modal</button>
+            <button id="downloadBtn">Download Filtered</button>
+            <button id="historyBtn">Linked History</button>
+        </div>
+        <div class="modal" id="historyModal" style="display: none;">
+            <div class="modal-content">
+                <h3>Employee History</h3>
+                <div id="historyContent">
+                    </div>
+                <button id="closeHistoryModal">Close</button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Position</th>
+                    <th>Basic Salary</th>
+                    <th>Pension Schema</th>
+                    <th>Date of Joining</th>
+                    <th>Photo</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTable">
+                <!-- Rows will be injected by JS -->
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- Add Modal -->
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <h3>Add Employee Salary</h3>
+        <input type="text" id="modalJobNumber" placeholder="Job Number">
+        <input type="text" id="modalName" placeholder="Name">
+        <select id="modalDept">
+            {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.dept_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" id="modalSalary" placeholder="Basic Salary">
+        <input type="text" id="modalPension" placeholder="Pension Schema">
+        <div class="btn-row">
+            <button id="modalCancel">Cancel</button>
+            <button id="modalSave">Save</button>
+        </div>
+    </div>
+</div>
+<script>
+const employees = [
+    {% for emp in employees %}
+     {
+            id: {{ emp.id }},
+            name: "{{ emp.first_name }} {{ emp.last_name }}",
+            department: "{{ emp.department.dept_name }}",
+            position: "{{ emp.position.title|default_if_none:'N/A' }}",
+            salary: {{ emp.salary }},
+            pension: `{% if emp.pensions.first %}{{ emp.pensions.first.employee_contribution }}%{% else %}N/A{% endif %}`,
+            doj: "{{ emp.hire_date }}",
+            photo_url: "{% if emp.photo %}{{ emp.photo.image.url|escapejs }}{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+const tableBody = document.getElementById('employeeTable');
+const selectAll = document.getElementById('selectAll');
+
+function renderTable(data) {
+tableBody.innerHTML = '';
+    data.forEach(emp => {
+        const tr = document.createElement('tr');
+        const photoHtml = emp.photo_url
+            ? `<img src="${emp.photo_url}" alt="${emp.name}'s Photo" style="max-width: 50px; max-height: 50px;">`
+            : 'No Photo';
+        tr.innerHTML = `
+            <td><input type="checkbox" class="rowCheckbox" data-id="${emp.id}"></td>
+            <td>${emp.name}</td>
+            <td>${emp.department}</td>
+            <td>${emp.position}</td>
+            <td>${emp.salary}</td>
+            <td>${emp.pension}</td>
+            <td>${emp.doj}</td>
+            <td>${photoHtml}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// Initial render
+renderTable(employees);
+
+// Select all logic
+selectAll.addEventListener('change', () => {
+    document.querySelectorAll('.rowCheckbox').forEach(cb => cb.checked = selectAll.checked);
+});
+
+
+// Expand advanced filters
+document.getElementById('toggleAdvanced').addEventListener('click', () => {
+    const adv = document.getElementById('advancedFilters');
+    adv.style.display = adv.style.display === 'block' ? 'none' : 'block';
+});
+
+//Click on the blank background to close
+window.addEventListener('click', (e) => {
+    if (e.target === addModal) {
+        addModal.style.display = 'none';
+    }
+});
+//Press ESC on the keyboard to turn off
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        addModal.style.display = 'none';
+    }
+});
+
+
+// Modal logic
+const addModal = document.getElementById('addModal');
+document.getElementById('addModalBtn').addEventListener('click', () => {
+    addModal.style.display = 'flex';
+});
+document.getElementById('modalCancel').addEventListener('click', () => {
+    addModal.style.display = 'none';
+});
+document.getElementById('modalSave').addEventListener('click', () => {
+    const name = document.getElementById('modalName').value;
+    const [first_name, ...lastParts] = name.split(' ');
+    const last_name = lastParts.join(' ');
+    const department = document.getElementById('modalDept').value;
+    const salary = parseFloat(document.getElementById('modalSalary').value);
+    const pension = document.getElementById('modalPension').value;
+    const hire_date = new Date().toISOString().split('T')[0];
+
+    fetch("/api/employees/add/", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            first_name,
+            last_name,
+            email: `${first_name.toLowerCase()}@example.com`,
+            department:document.getElementById('modalDept').value,
+            salary,
+            hire_date,
+            pension:pension
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Employee added successfully!');
+            location.reload();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => alert("Request failed: " + err));
+});
+
+document.getElementById('bulkImportBtn').addEventListener('click', () => {  // CHANGE 2
+    document.getElementById('csvFile').click();  // Trigger file selection
+});
+
+document.getElementById('csvFile').addEventListener('change', (event) => {  // CHANGE 3
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csvData = e.target.result;
+            importCSV(csvData);  // Function to send data to the server
+        };
+        reader.readAsText(file);
+    }
+});
+
+function importCSV(csvData) {
+    fetch("/api/employees/import/", {  // CHANGE 4:  URL for import view
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ csv_data: csvData })  // Send CSV data as JSON
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("CSV imported successfully!");
+            location.reload();  // Refresh the page
+        } else {
+            alert("CSV import failed: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error importing CSV.");
+    });
+}
+
+document.getElementById('downloadBtn').addEventListener('click', () => {  // CHANGE 7
+    downloadFilteredData();
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            if (cookie.trim().startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.trim().substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function downloadFilteredData() {
+    const table = document.getElementById('employeeTable');
+    const rows = table.querySelectorAll('tr');
+    const csvContent = [];
+
+    // Add header row
+    const headerRow = ["Select", "Name", "Department", "Position", "Basic Salary", "Pension Schema", "Date of Joining", "Photo"];
+    //const headerCells = table.querySelectorAll('thead th');
+    //headerCells.forEach(cell => headerRow.push(cell.textContent));
+    csvContent.push(headerRow.join(','));
+
+    // Add data rows
+    rows.forEach(row => {
+        const dataRow = [];
+        const dataCells = row.querySelectorAll('td');
+        dataCells.forEach((cell, index) => {
+            // Handle checkbox column (if needed)
+            if (index === 0) {
+                const checkbox = cell.querySelector('input[type="checkbox"]');
+                dataRow.push(checkbox ? (checkbox.checked ? "Selected" : "Not Selected") : "");
+            }else if (index === 7) { // Index 7 is the Photo column
+                const img = cell.querySelector('img');
+                const imageUrl = img ? img.src : "No Photo Available";
+                dataRow.push(imageUrl);
+            }
+             else {
+                dataRow.push(cell.textContent.trim()); // Trim whitespace
+            }
+        });
+        csvContent.push(dataRow.join(','));
+    });
+
+    const csvString = csvContent.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'filtered_employees.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+const historyModal = document.getElementById('historyModal');  // CHANGE 9
+const historyContent = document.getElementById('historyContent');
+const closeHistoryModal = document.getElementById('closeHistoryModal');
+
+document.getElementById('historyBtn').addEventListener('click', () => {  // CHANGE 10
+    historyModal.style.display = 'flex';
+    fetchEmployeeHistory();
+});
+
+closeHistoryModal.addEventListener('click', () => {  // CHANGE 11
+    historyModal.style.display = 'none';
+});
+
+function fetchEmployeeHistory() {  // CHANGE 12
+    fetch("/api/employees/history/", {  // URL to fetch history
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayHistory(data.history);
+        } else {
+            historyContent.textContent = "Failed to fetch history: " + data.error;
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        historyContent.textContent = "Error fetching history.";
+    });
+}
+
+function displayHistory(history) {  // CHANGE 13
+    historyContent.innerHTML = '';  // Clear previous content
+    const ul = document.createElement('ul');
+    history.forEach(record => {
+        const li = document.createElement('li');
+        li.textContent = `${record.timestamp} - ${record.user_email} - ${record.action} - ${record.changes}`;
+        ul.appendChild(li);
+    });
+    historyContent.appendChild(ul);
+}
+</script>
+{% endblock %}

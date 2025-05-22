@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User{% endblock %}
+
+{% block content %}
+    <div class="User_settings-container">
+        <!-- User content -->
+        <h2>Pending Approvals </h2>
+        <div class="section">
+            <ul class="approval-list" id="approvalList">
+                {% for approval in pending_approvals %}
+                    <li class="approval-item">
+                        <div>
+                          <strong>{{ approval.request_type }}</strong> - {{ approval.employee_name }} ({{ approval.submitted_at }})
+                        </div>
+                        <div class="actions">
+                            {% if approval.status == 'pending' %}
+                                <button onclick="rejectApproval({{ approval.id }}, this, '{% url 'reject_approval_api' approval.id %}')">Reject</button>
+                            {% else %}
+                                <span class="status">{{ approval.status|capfirst }}</span>
+                            {% endif %}
+                            <button onclick="viewDetails({{ approval.id }})">View</button>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>No pending approvals.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+                <h2>API Key Management</h2>
+        <div class="section api-keys" id="apiSection">
+            <div class="api-key" id="currentApiKey">
+              <span>
+                  {% if api_key %}
+                    {{ api_key }}
+                  {% else %}
+                    No API key generated.
+                  {% endif %}
+              </span>
+              <div class="api-details">
+                {% if expires_at %}
+                    Expires: <span id="keyExpiration">{{ expires_at }}</span>
+                {% endif %}
+              </div>
+              <div class="api-buttons">
+                <button onclick="revokeKey('{% url 'revoke_api_key_api' %}')">Revoke</button>
+                <button onclick="generateKey('{% url 'generate_api_key_api' %}')">Generate New Key</button>
+              </div>
+            </div>
+        </div>
+
+        <h2>Recent Activity</h2>
+        <div class="section">
+            <ul class="record-list" id="recordList">
+                {% for activity in recent_activity %}
+                    <li class="record-item">
+                <div>
+                    <span class="symbol {% if activity.action == 'create' %}plus{% else %}minus{% endif %}">
+                         {% if activity.action == 'create' %}+{% else %}-{% endif %}
+                    </span>
+                    {{ activity.description }}
+                </div>
+                <div>{{ activity.timestamp }}</div>
+                    </li>
+                {% empty %}
+                    <li>No recent activity.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <h2>All Approval Records</h2>
+        <div class="section">
+            <table class="approval-table">
+                <thead>
+                    <tr>
+                        <th>Request Type</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in approvals %}
+                        <tr>
+                            <td>{{ a.request_type }}</td>
+                            <td>{{ a.submitted_at }}</td>
+                            <td>{{ a.status }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">No approvals found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+<script>
+function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+async function rejectApproval(approvalId, buttonElement) {
+    const csrftoken = getCookie('csrftoken');
+    const url = `/api/approvals/${approvalId}/reject/`;
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+        });
+        const data = await response.json();
+        if (response.ok && data.status === 'success') {
+            buttonElement.parentNode.innerHTML = '<span class="status">Rejected</span>';
+            alert(data.message);
+        } else {
+            alert(`Error: ${data.message || 'Could not reject approval.'}`);
+        }
+    } catch (error) {
+        console.error('Error rejecting approval:', error);
+        alert('An error occurred while rejecting the approval.');
+    }
+}
+
+async function generateKey() {
+    const csrftoken = getCookie('csrftoken');
+        try {
+            const response = await fetch(generateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+            });
+            const data = await response.json();
+            if (response.ok && data.status === 'success') {
+                document.getElementById('currentApiKey').innerHTML = `
+                    <span>${data.api_key}</span>
+                    <div class="api-buttons">
+                        <button onclick="revokeKey()">Revoke</button>
+                    </div>
+                `;
+                alert('API key generated successfully. Please save it as it will not be shown again.');
+            } else {
+                alert(`Error: ${data.message || 'Could not generate API key.'}`);
+            }
+        } catch (error) {
+            console.error('Error generating API key:', error);
+            alert('An error occurred while generating the API key.');
+        }
+}
+
+async function revokeKey(revokeUrl) {
+    const csrftoken = getCookie('csrftoken');
+        try {
+            const response = await fetch(revokeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+            });
+            const data = await response.json();
+            if (response.ok && data.status === 'success') {
+                document.getElementById('currentApiKey').innerHTML = '<span>No API key generated.</span>';
+                alert(data.message);
+            } else {
+                alert(`Error: ${data.message || 'Could not revoke API key.'}`);
+            }
+        } catch (error) {
+            console.error('Error revoking API key:', error);
+            alert('An error occurred while revoking the API key.');
+        }
+}
+
+async function renewKey() {
+    try {
+        const response = await fetch(renewApiKeyUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        const data = await response.json();
+        if (response.ok && data.status === 'success') {
+            updateApiKeyUI(data); // Function to update API key UI
+            addRecordToList('Renewed API key');
+            alert('API key renewed successfully.');
+        } else {
+            console.error('Failed to renew API key:', data.message);
+            alert('Failed to renew API key: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error renewing API key:', error);
+        alert('An error occurred while renewing the API key.');
+    }
+}
+
+function updateApiKeyUI(data) {
+    const currentApiKeyDiv = document.getElementById("currentApiKey");
+    currentApiKeyDiv.innerHTML = `
+        <span>${data.api_key}</span>
+        <div class="api-details">
+            Expires: <span id="keyExpiration">${new Date(data.expires_at).toLocaleDateString()}</span>
+        </div>
+        <div class="api-buttons">
+            <button onclick="revokeKey()">Revoke</button>
+            <button onclick="generateKey()">Generate New Key</button>
+        </div>
+    `;
+}
+
+function addRecordToList(description) {
+    const recordList = document.getElementById("recordList");
+    const newRecord = document.createElement("li");
+    newRecord.className = "record-item";
+    newRecord.innerHTML = `<div><span class="symbol plus">+</span>${description}</div><div>${new Date().toLocaleString()}</div>`;
+    recordList.prepend(newRecord);
+}
+
+function updateNotification(radio) {
+    // ... (Your updateNotification function)
+    addRecordToList('Notification channel set to: ' + label);
+    // Consider sending update to backend here using fetch
+}
+
+async function fetchApprovals() {
+    try {
+        const response = await fetch('/api/approvals/'); // Use your actual URL
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const approvalList = document.getElementById('approvalList');
+        approvalList.innerHTML = '';
+
+        if (data.status === 'success' && data.data) {
+            data.data.forEach(approval => {
+                const li = document.createElement('li');
+                li.className = 'approval-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${approval.request_type}</strong> - ${approval.employee_name} (${new Date(approval.submitted_at).toLocaleString()})
+                    </div>
+                    <div class="actions">
+                        <button onclick="rejectApproval(${approval.id}, this)">Reject</button>
+                        <button onclick="viewDetails(${approval.id})">View</button>
+                    </div>
+                `;
+                approvalList.appendChild(li);
+            });
+        } else {
+            approvalList.innerHTML = '<li>No pending approvals.</li>';
+        }
+    } catch (error) {
+        console.error('Error fetching approvals:', error);
+        approvalList.innerHTML = '<li>Error loading pending approvals.</li>';
+    }
+}
+
+function viewDetails(approvalId) {
+    alert(`Viewing details for approval ${approvalId} (mock).`);
+}
+
+fetchApprovals();
+</script>
+{% endblock %}

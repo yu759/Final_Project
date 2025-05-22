@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+   <div class="container mt-5 text-center">
+    <h2>You have been logged out.</h2>
+    <p>Thanks for using PayGenius. <a href="{% url 'login' %}">Login again</a></p>
+    </div>
+{% endblock %}

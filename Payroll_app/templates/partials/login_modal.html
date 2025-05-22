@@ -1,0 +1,97 @@
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="loginForm" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" id="next" value="{{ request.GET.next|default:'/' }}">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login to PayGenius</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetLoginForm()"></button>
+        </div>
+        <div class="modal-body">
+          <div id="loginErrorMessage" class="alert alert-danger" style="display:none;"></div>
+
+          <div class="mb-3">
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required autocomplete="username" aria-label="Email address">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required autocomplete="current-password" aria-label="Password">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="resetLoginForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function resetLoginForm() {
+    document.getElementById("loginForm").reset();
+    document.getElementById("loginErrorMessage").style.display = 'none'; // Hide error message on reset
+    document.getElementById("loginErrorMessage").textContent = '';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById("loginForm");
+    const loginErrorMessage = document.getElementById("loginErrorMessage");
+
+    // Get 'next' parameter from URL and set it to the hidden field
+    const urlParams = new URLSearchParams(window.location.search);
+    const next = urlParams.get("next") || "/";
+    document.getElementById("next").value = next;
+
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();  // Prevent the default submission behavior
+
+        loginErrorMessage.style.display = 'none'; // Hide previous error
+        loginErrorMessage.textContent = '';
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        // Get CSRF Token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const next = document.getElementById("next").value;
+
+        fetch(loginForm.action, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json', // Explicitly specify sending JSON data
+                'X-CSRFToken': csrfToken // Ensure CSRF token is sent
+            },
+            body: JSON.stringify({ email: email, password: password, next: next }) // Send JSON data
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Try to read error message from response, if available
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+                    }).catch(() => {
+                        // If response is not JSON or cannot be parsed, use generic error
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Login successful, redirect to the specified URL
+                    window.location.href = data.redirect_url || "/";
+                } else {
+                    // Login failed, display error message directly in the modal
+                    loginErrorMessage.textContent = data.error || "Login failed. Please check your email and password";
+                    loginErrorMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                // Handle network errors or other errors during the fetch process
+                console.error("Login Error：", error);
+                loginErrorMessage.textContent = `Server Error: ${error.message}`;
+                loginErrorMessage.style.display = 'block';
+            });
+    });
+});
+</script>

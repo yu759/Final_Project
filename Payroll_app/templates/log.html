@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Operation Logs</h2>
+    <table>
+        <thead>
+            <tr><th>Operation Time</th><th>Operator</th><th>Details</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+            {% for log in operation_logs %}
+                <tr>
+                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.user_email }}</td>
+                    <td>{{ log.model_name }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.changes }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No operation logs available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>System Logs</h2>
+    <table>
+        <thead>
+            <tr><th>Operation Time</th><th>Operator</th><th>Details</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+            {% for log in system_logs %}
+                <tr>
+                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.user_email }}</td>
+                    <td>{{ log.model_name }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.changes }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No system logs available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

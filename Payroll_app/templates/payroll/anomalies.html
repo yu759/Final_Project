@@ -1,0 +1,105 @@
+{% extends 'base.html' %}  {% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Salary Anomaly Detection</h1>
+
+    {% if anomalous_employees %}
+    <div class="alert alert-warning" role="alert">
+        The following employees have been identified as potential salary anomalies:
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Salary</th>
+                    <th>Bonus</th>
+                    <th>Performance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in anomalous_employees %}
+                <tr>
+                    <td>{{ employee.id }}</td>
+                    <td>{{ employee.first_name }}</td>
+                    <td>{{ employee.last_name }}</td>
+                    <td>{{ employee.salary }}</td>
+                    <td>{{ employee.bonus }}</td>
+                    <td>{{ employee.performance }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-search"></i> Details
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-flag"></i> Investigate
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+        No salary anomalies detected.
+    </div>
+    {% endif %}
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .container {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid #dee2e6;
+    }
+
+    .table th, .table td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    .table th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.075);
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .alert-warning {
+        color: #85640c;
+        background-color: #fff3cd;
+        border-color: #ffecb5;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+</style>
+{% endblock %}

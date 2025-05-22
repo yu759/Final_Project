@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}PayGenius{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/employee_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/salary.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all_ded.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user_settings.css' %}">
+<!--    <link rel="stylesheet" href="{% static 'css/modals.css' %}">-->
+    <!-- Public CSS/JS -->
+<style>
+    /* Basic */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #87CEEB;
+        min-height: 100vh;
+    }
+
+    /* Navigation Container */
+    .nav-container {
+        background: #447A9C;
+        padding: 1rem 2rem;
+        position: relative;
+    }
+
+    /* Top navigation */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #logoLink {
+        display: inline-block;
+        height: 70px;
+        width: 70px;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+    }
+    .logo {
+        display: block;
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+
+    /* Search function */
+    .search-wrapper {
+        position: relative;
+        flex-grow: 1;
+        max-width: 600px;
+        margin: 0 2rem;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        border: 2px solid #87CEEB;
+        background: rgba(255,255,255,0.9);
+    }
+
+    /* Search modal */
+    .search-modal {
+        display:none;
+        position: fixed;
+        width: 300px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1040;
+        overflow-y:auto;
+        max-height: 300px;
+        border-radius: 8px;
+        padding: 10px;
+        transition:opacity 0.3s ease,transform 0.2s ease;
+        transform:translateY(-5px);
+        opacity:0;
+        pointer-events:none;
+    }
+
+    .search-modal.active {
+        opacity:1;
+        pointer-events:auto;
+        display:block;
+        transform:translateY(0);
+    }
+
+    /* Main menu */
+    .main-menu {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1rem 0;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .menu-item a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .menu-item a:hover {
+        color: #f5f5f5;
+    }
+
+    /* user info */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: #447A9C;
+        border:none;
+        color: white;
+        {% if not user.is_authenticated %}
+        pointer-events: none; /* Disable clicks for unlogged-in users */
+        {% endif %}
+    }
+
+    .modal-header { /* This applies to custom modals or might conflict with Bootstrap's modal-header */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        /* margin-bottom: 1rem; - Removed, as Bootstrap's modal-header already has padding */
+    }
+
+    .close-btn { /* Specific to your custom search modal */
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+
+    .overlay { /* This custom overlay might conflict with Bootstrap's modal-backdrop */
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1060; /* This z-index is too low for Bootstrap modals */
+    }
+
+    .main-footer {
+        background-color: #f8f9fa;
+        padding: 20px 0;
+        text-align: center;
+        border-top: 1px solid #dee2e6;
+        margin-top: 20px;
+    }
+
+    .main-footer .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+</style>
+</head>
+<body>
+   <!-- Navigation container -->
+    <div class="nav-container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="dropdown">
+                <a href="#" id="logoLink" {% if not user.is_authenticated %} data-bs-toggle="modal" data-bs-target="#loginModal"{% endif %}>
+                    <img src="{% static 'images/PayGenius-logo.png' %}" alt="Logo" id="logo">
+                </a>
+                {% if not user.is_authenticated %}
+                <ul class="dropdown-menu" aria-labelledby="logoDropdown">
+                    {% csrf_token %}
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                </ul>
+                {% endif %}
+            </div>
+            <!--Login Modal-->
+            {% include 'partials/login_modal.html' %}
+            <!-- Search box -->
+            <div class="search-wrapper">
+                <input type="text"
+                       class="search-box"
+                       placeholder="Search employees, departments..."
+                       id="searchBox"
+                       oninput="searchQuery()">
+            </div>
+            <!-- Search result pop-up window -->
+            <div class="search-modal z-50" id="searchResultsModal">
+                <div class="modal-header">
+                    <span>Search Results</span>
+                    <span class="close-btn" onclick="closeSearchModal()">×</span>
+                </div>
+                <ul id="searchResultsList" class="text-sm text-gray-800 space-y-2"></ul>
+            </div>
+
+
+            <!-- User info -->
+            <div class="dropdown">
+                <a class="user-profile dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if user.is_authenticated %}
+                    <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                {% else %}
+                    <span>User</span>
+                {% endif %}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    {% if request.user.is_authenticated %}
+                    <li><a class="dropdown-item" href="{% url 'user_settings' %}">Settings</a></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item" aria-label="Logout">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main menu -->
+        <nav class="main-menu">
+            <div class="menu-item"><a href="{% url 'home' %}">Dashboard</a></div>
+            <div class="menu-item"><a href="{% url 'employee_list' %} ">Employees</a></div>
+            <div class="menu-item"><a href="{% url 'all_ded' %}">Allowances & Deductions</a></div>
+            <div class="menu-item"><a href="{% url 'salary' %}">Salary</a></div>
+            <div class="menu-item"><a href="{% url 'admin' %}">Administration</a></div>
+        </nav>
+    </div>
+    <!-- Content blocks -->
+    <main>
+        {% block content %}
+        <!-- The content of the sub-template will be inserted here -->
+        {% endblock %}
+    </main>
+
+    <!-- Public footer -->
+   {% block footer %}
+   <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 PayGenius. All rights reserved.</p>
+        </div>
+   </footer>
+   {% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+function searchQuery() {
+    const query = document.getElementById('searchBox').value.trim();
+    const modal = document.getElementById('searchResultsModal');
+    const resultsList = document.getElementById('searchResultsList');
+    const searchBox = document.getElementById('searchBox');
+
+    const rect = searchBox.getBoundingClientRect();
+    modal.style.top = `${rect.bottom + window.scrollY + 10}px`; // The position of the pop-up window is slightly shifted
+    modal.style.left = `${rect.left + window.scrollX}px`;
+
+    if (query.length === 0) {
+        modal.classList.remove('active');
+        resultsList.innerHTML = '';
+        return;
+    }
+    modal.classList.add('active');
+
+    //Inquiry request
+    fetch(`/search/?q=${encodeURIComponent(query)}`)
+        .then(response => {
+            if(!response.ok){
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data=> {
+            resultsList.innerHTML = '';
+
+            if (data.results.length > 0) {
+                data.results.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item.name;
+                    resultsList.appendChild(li);
+                });
+
+            } else {
+               const li = document.createElement('li');
+                li.textContent = 'No data found';
+                li.style.color = '#888';
+                li.style.fontStyle = 'italic';
+                resultsList.appendChild(li);
+            }
+        })
+        .catch(err => {
+            console.error('Search error:', err);
+             modal.classList.add('active');
+            resultsList.innerHTML = '<li style="color:red;">Search failed</li>';
+        });
+    }
+
+function closeSearchModal() {
+    const modal = document.getElementById('searchResultsModal');
+    modal.classList.remove('active');
+    document.getElementById('searchResultsList').innerHTML = '';
+}
+
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('searchResultsModal');
+    const searchBox = document.getElementById('searchBox');
+    if (!modal.contains(event.target) && event.target !== searchBox) {
+        modal.classList.remove('active');
+    }
+});
+
+//Obtain the CSRF Token dynamically in JavaScript
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    // get CSRF token
+    const csrfToken = getCookie('csrftoken');
+        //Add in the request header
+
+</script>
+</body>
+</html>

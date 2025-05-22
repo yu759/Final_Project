@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+    <div class="search-container">
+        <!-- Search -->
+{% for result in results %}
+    <div class="search-item">{{ result.title }}</div>
+{% empty %}
+    <div class="no-results">No results found.</div>
+{% endfor %}
+    </div>
+<script>
+
+</script>
+{% endblock %}
